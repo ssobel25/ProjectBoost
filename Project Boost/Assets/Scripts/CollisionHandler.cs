@@ -10,6 +10,8 @@ public class CollisionHandler : MonoBehaviour
     Movement movement;
     AudioSource audioSource;
 
+    bool isTransitioning = false;
+
     private void Start()
     {
         movement = GetComponent<Movement>();
@@ -24,25 +26,35 @@ public class CollisionHandler : MonoBehaviour
                 break;
 
             case "Finish":
-                StartSuccessSequence();
+                if (!isTransitioning)
+                {
+                    StartSuccessSequence();
+                }
                 break;
 
             default:
-                StartCrashSequence();
+                if (!isTransitioning)
+                {
+                    StartCrashSequence();
+                }
                 break;
         }
     }
 
     void StartSuccessSequence()
     {
+        isTransitioning = true;
         movement.enabled = false;
+        audioSource.Stop();
         audioSource.PlayOneShot(success);
         Invoke ("LoadNextLevel", loadDelay);
     }
 
     void StartCrashSequence()
     {
+        isTransitioning = true;
         movement.enabled = false;
+        audioSource.Stop();
         audioSource.PlayOneShot(crash);
         Invoke("ReloadLevel", loadDelay);
     }
