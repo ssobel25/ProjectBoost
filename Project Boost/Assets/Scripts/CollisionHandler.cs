@@ -13,14 +13,23 @@ public class CollisionHandler : MonoBehaviour
     AudioSource audioSource;
 
     bool isTransitioning = false;
+    bool collisionIsDisabled = false;
+
 
     private void Start()
     {
         movement = GetComponent<Movement>();
         audioSource = GetComponent<AudioSource>();
     }
+
+    private void Update() 
+    {
+        RespondToDebugKeys();
+    }
     private void OnCollisionEnter(Collision other) 
     {
+        if (isTransitioning || collisionIsDisabled) {return;}
+
         switch (other.gameObject.tag)
         {
             case "Friendly":
@@ -28,21 +37,27 @@ public class CollisionHandler : MonoBehaviour
                 break;
 
             case "Finish":
-                if (!isTransitioning)
-                {
-                    StartSuccessSequence();
-                }
+                StartSuccessSequence();
                 break;
 
             default:
-                if (!isTransitioning)
-                {
-                    StartCrashSequence();
-                }
+                StartCrashSequence();
                 break;
         }
     }
 
+    void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextLevel();
+        }
+
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            collisionIsDisabled = !collisionIsDisabled;
+        }
+    }
     void StartSuccessSequence()
     {
         isTransitioning = true;
